@@ -9,6 +9,7 @@ our $day        = 1;
 our $num        = 3;
 our $fname      = '';
 our $outfile    = '';
+our $xmlfile    = '';
 our $mode       = '';
 
 our $help;
@@ -23,5 +24,5 @@ GetOptions( 'id=s'     => \$id,
 			'num=i'    => \$num,
 			'list=s'   => \$fname,
 			'csv=s'    => \$outfile,
-#			'mode=s'   => \$mode,
+			'xml=s'    => \$xmlfile,
 			'help|?'   => \$help); # or pod2usage(1);

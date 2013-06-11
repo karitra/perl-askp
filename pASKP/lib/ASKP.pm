@@ -352,6 +352,8 @@ sub id
 package ASKP::Period;
 use Carp;
 
+sub name($);
+
 sub new
 {
 	my $class   = shift;
@@ -373,15 +375,21 @@ sub new
 
 sub from
 {
-  my $self = shift;
-  return $self->{from};
+  return shift->{from};
 }
 
 sub to
 {
-  my $self = shift;
-  return $self->{to};
+  return shift->{to};
 }
+
+=pod
+
+Note: 'name' field will be set in the period class only if it was created from
+       fetch_days call!
+
+=cut
+sub name($) {  return shift->{name}; }
 
 sub date_pair
 {
@@ -460,10 +468,38 @@ sub days
 	return $self->{days};
 }
 
-sub dump_csv {
+sub dump_xss {
   my $self  = shift;
   my $fname = shift;
 
+  if ($fname) {
+	open FD, '>' , $fname or die "Failed to open XSS file for output: $@\n";
+  } else {
+	*FD = *STDOUT;
+  }
+
+  my $ps;
+
+  for my $d ( sort keys %{ $self->days() } ) {
+	$ps = $self->day($d);
+	if ($ps) {
+	  print FD "$d;", $ps->csv(), "\n";
+	} else {
+	  my $s = "$d; 0,0";
+	  $s .= ";0,0" for (2..48);
+	  print FD "$s\n";
+	}
+  }
+
+  if ($fname) {
+	close FD;
+  }
+}
+
+
+sub dump_csv {
+  my $self  = shift;
+  my $fname = shift;
 
   if ($fname) {
 	open FD, '>' , $fname or die "Failed to open CSV file for output: $@\n";
@@ -511,6 +547,10 @@ sub fetch_days
 	} continue {
 		$date = ASKP::next_date($date);
 	}
+
+	my $cnt = $c->fetch_cnt($id);
+
+	$p->{name} = $cnt->{name} if $cnt;
 
 	$p;
 }
