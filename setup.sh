@@ -9,7 +9,7 @@ if [ ! -d ~/scripts ]; then
 fi
 
 echo Copying scripts
-cp -R p-utils/* ~/scripts
+cp -Rf p-utils/* ~/scripts
 
 pushd pASKP
 make clean
